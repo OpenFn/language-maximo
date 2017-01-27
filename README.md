@@ -1,7 +1,7 @@
-Language HTTP
-=============
+Language Maximo
+==============
 
-Language Pack for building expressions and operations to make HTTP calls.
+Language Pack for building expressions and operations to access IBM Maximo EAM.
 
 Documentation
 -------------
@@ -10,61 +10,24 @@ Documentation
 #### sample configuration
 ```js
 {
-  "username": "taylor@openfn.org",
+  "username": "taylor",
   "password": "supersecret",
-  "baseUrl": "https://instance_name.surveycto.com",
-  "authType": "digest"
+  "baseUrl": "https://maximo-demo76.mro.com",
 }
 ```
 
 #### sample fetch expression
 ```js
 fetch({
-  "getEndpoint": "api/v1/forms/data/wide/json/mod_coach",
-  "query": function(state) {
-      return { "date": dataValue("_json[(@.length-1)].SubmissionDate")(state) }
-  },
-  "postUrl": "http://localhost:4000/inbox/8ad63a29-5c25-4d8d-ba2c-fe6274dcfbab",
-})
-```
-
-#### sample custom GET and then POST
-```js
-get("forms/data/wide/json/form_id", {
-  query: function(state) {
-    return { date: state.lastSubmissionDate || "Aug 29, 2016 4:44:26 PM"}
-  },
-  callback: function(state) {
-    // Pick submissions out in order to avoid `post` overwriting `response`.
-    var submissions = state.response.body;
-    // return submissions
-    return submissions.reduce(function(acc, item) {
-        // tag submissions as part of the "form_id" form
-        item.formId = "form_id"
-        return acc.then(
-          post(
-            "https://www.openfn.org/inbox/very-very-secret",
-            { body: item }
-          )
-        )
-      }, Promise.resolve(state))
-      .then(function(state) {
-        if (submissions.length) {
-          state.lastSubmissionDate = submissions[submissions.length-1].SubmissionDate
-        }
-        return state;
-      })
-      .then(function(state) {
-        delete state.response
-        return state;
-      })
-  }
+  "getEndpoint": "maxrest/rest/os/mxinvbal",
+  "query": "_lpwd=xxx&_lid=xxx&itemnum=PUMP100&binnum=N-G-2&_format=json",
+  "postUrl": "https://www.openfn.org/inbox/some-secret-uuid",
 })
 ```
 
 ### Sample post with existing data
 ```js
-postData({
+post({
   url: "INSERT_URL_HERE",
   "body": function(state) {
         return {
