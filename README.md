@@ -20,7 +20,16 @@ Documentation
 ```js
 fetch({
   "getEndpoint": "maxrest/rest/os/mxinvbal",
-  "query": "_lpwd=xxx&_lid=xxx&itemnum=PUMP100&binnum=N-G-2&_format=json",
+  "query": {
+    "_action": "AddChange",
+    "PHYSCNT": 7,
+    "PHYSCNTDATE": "2017-01-26T20:35:56-06:00",
+    "RECONCILED": 0,
+    // MUST ENCRYPT THIS AND SEND AS "MAXAUTH" HEADER...
+    // "_lid": "foo",
+    // "_lpwd": "bar",
+    "_format":"json"
+  },
   "postUrl": "https://www.openfn.org/inbox/some-secret-uuid",
 })
 ```
@@ -28,7 +37,7 @@ fetch({
 ### Sample post with existing data
 ```js
 post({
-  url: "INSERT_URL_HERE",
+  "endpoint": "INSERT_URL_HERE",
   "body": function(state) {
         return {
           "field_1": "some_data",
@@ -36,10 +45,6 @@ post({
           "field_id": dataValue("Some.Json.Object.Id")(state)
         }
 
-  },
-  headers: {
-      "Authorization": "AUTH_KEY",
-      "Content-Type": "application/json"
   }
 })
 

@@ -1,7 +1,8 @@
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { getThenPost, clientPost } from './Client';
 import request from 'request'
 import { resolve as resolveUrl } from 'url';
+var base64 = require('base-64');
+var utf8 = require('utf8');
 
 /** @module Adaptor */
 
@@ -43,18 +44,62 @@ export function fetch(params) {
 
   return state => {
 
-    const { getEndpoint, query, postUrl } = expandReferences(params)(state);
+    function assembleError({ response, error }) {
+      if (response && ([200,201,202].indexOf(response.statusCode) > -1)) return false;
+      if (error) return error;
+      return new Error(`Server responded with ${response.statusCode}`)
+    }
 
-    const { username, password, baseUrl, authType } = state.configuration;
+    const { endpoint, query, postUrl } = expandReferences(params)(state);
 
-    var sendImmediately = authType == 'digest' ? false : true;
+    const { username, password, baseUrl } = state.configuration;
 
-    const url = resolveUrl(baseUrl + '/', getEndpoint)
+    var authy = username+":"+password;
+    console.log(authy)
+    var bytes = utf8.encode(authy);
+    var encoded = base64.encode(bytes);
+    console.log(encoded)
+
+    const url = resolveUrl(baseUrl + '/', endpoint)
 
     console.log("Fetching data from URL: " + url);
     console.log("Applying query: " + JSON.stringify(query))
 
-    return getThenPost({ username, password, query, url, sendImmediately, postUrl })
+    return new Promise((resolve, reject) => {
+
+      request({
+        url: url, //URL to hit
+        qs: query, //Query string data
+        headers: {
+          // Maximo's authentication header
+          'maxauth': encoded
+        }
+      }, function(error, response, getResponseBody){
+        error = assembleError({error, response})
+        if (error) {
+          console.error("GET failed.")
+          console.log(response)
+          reject(error);
+        } else {
+          console.log("GET succeeded.");
+          // console.log(response)
+          console.log("Response body: " + getResponseBody)
+          request.post ({
+            url: postUrl,
+            json: JSON.parse(getResponseBody)
+          }, function(error, response, postResponseBody){
+            error = assembleError({error, response})
+            if (error) {
+              console.error("POST failed.")
+              reject(error);
+            } else {
+              console.log("POST succeeded.");
+              resolve(getResponseBody);
+            }
+          })
+        }
+      });
+    })
     .then((response) => {
       console.log("Success:", response);
       let result = (typeof response === 'object') ? response : JSON.parse(response);
