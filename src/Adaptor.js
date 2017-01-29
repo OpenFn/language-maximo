@@ -55,10 +55,10 @@ export function fetch(params) {
     const { username, password, baseUrl } = state.configuration;
 
     var authy = username+":"+password;
-    console.log(authy)
+    // console.log(authy)
     var bytes = utf8.encode(authy);
     var encoded = base64.encode(bytes);
-    console.log(encoded)
+    // console.log(encoded)
 
     const url = resolveUrl(baseUrl + '/', endpoint)
 
@@ -117,7 +117,7 @@ export function fetch(params) {
 * Make a POST request using existing data from state
 */
 
-export function postData(params) {
+export function create(params) {
 
   return state => {
 
@@ -127,23 +127,38 @@ export function postData(params) {
       return new Error(`Server responded with ${response.statusCode}`)
     }
 
-    const { url, body, headers } = expandReferences(params)(state);
+    const { endpoint, body } = expandReferences(params)(state);
+
+    const { username, password, baseUrl } = state.configuration;
+
+    var authy = username+":"+password;
+    // console.log(authy)
+    var bytes = utf8.encode(authy);
+    var encoded = base64.encode(bytes);
+    // console.log(encoded);
+
+    const url = resolveUrl(baseUrl + '/', endpoint)
+
+    console.log("Creating data at URL: " + url);
+    console.log("Post body:")
+    console.log(JSON.stringify(body, null, 4) + "\n");
 
     return new Promise((resolve, reject) => {
-      console.log("Request body:");
-      console.log("\n" + JSON.stringify(body, null, 4) + "\n");
       request.post ({
         url: url,
         json: body,
-        headers
+        headers: {
+          // Maximo's authentication header
+          'maxauth': encoded
+        }
       }, function(error, response, body){
         error = assembleError({error, response})
         if(error) {
           reject(error);
-          console.log(response);
+          console.log(body);
         } else {
-          console.log("Printing response...\n");
-          console.log(JSON.stringify(response, null, 4) + "\n");
+          console.log("Printing response body...\n");
+          console.log(JSON.stringify(body, null, 4) + "\n");
           console.log("POST succeeded.");
           resolve(body);
         }
