@@ -115,7 +115,6 @@ export function fetch(params) {
 /*
 * Make a POST request using existing data from state
 */
-
 export function create(params) {
 
   return state => {
@@ -156,6 +155,123 @@ export function create(params) {
           reject(error);
           console.log(body);
         } else {
+          console.log(response)
+          console.log("Printing response body...\n");
+          console.log(JSON.stringify(body, null, 4) + "\n");
+          console.log("POST succeeded.");
+          resolve(body);
+        }
+      })
+    }).then((data) => {
+      const nextState = { ...state, response: { body: data } };
+      return nextState;
+    })
+
+  }
+
+}
+
+export function update(params) {
+
+  return state => {
+
+    function assembleError({ response, error }) {
+      if (response && ([200,201,202].indexOf(response.statusCode) > -1)) return false;
+      if (error) return error;
+      return new Error(`Server responded with ${response.statusCode}`)
+    }
+
+    const { endpoint, body } = expandReferences(params)(state);
+
+    const { username, password, baseUrl } = state.configuration;
+
+    var authy = username+":"+password;
+    // console.log(authy)
+    var bytes = utf8.encode(authy);
+    var encoded = base64.encode(bytes);
+    // console.log(encoded);
+
+    const url = resolveUrl(baseUrl + '/', endpoint)
+
+    console.log("Performing update at URL: " + url);
+    console.log("Body:")
+    console.log(JSON.stringify(body, null, 4) + "\n");
+
+    return new Promise((resolve, reject) => {
+      request.post ({
+        url: url,
+        json: body,
+        headers: {
+          // Maximo's authentication header
+          'maxauth': encoded,
+          'x-methodoverride': 'PATCH',
+          'patchtype': 'MERGE'
+        }
+      }, function(error, response, body){
+        error = assembleError({error, response})
+        if(error) {
+          reject(error);
+          console.log(body);
+        } else {
+          // console.log(response)
+          console.log("Printing response body...\n");
+          console.log(JSON.stringify(body, null, 4) + "\n");
+          console.log("POST succeeded.");
+          resolve(body);
+        }
+      })
+    }).then((data) => {
+      const nextState = { ...state, response: { body: data } };
+      return nextState;
+    })
+
+  }
+
+}
+
+export function update75(params) {
+
+  return state => {
+
+    function assembleError({ response, error }) {
+      if (response && ([200,201,202].indexOf(response.statusCode) > -1)) return false;
+      if (error) return error;
+      return new Error(`Server responded with ${response.statusCode}`)
+    }
+
+    const { endpoint, body } = expandReferences(params)(state);
+
+    const { username, password, baseUrl } = state.configuration;
+
+    var authy = username+":"+password;
+    // console.log(authy)
+    var bytes = utf8.encode(authy);
+    var encoded = base64.encode(bytes);
+    // console.log(encoded);
+
+    const url = resolveUrl(baseUrl + '/', endpoint)
+
+    console.log("Performing update at URL: " + url);
+    console.log("Body:")
+    console.log(JSON.stringify(body, null, 4) + "\n");
+
+    return new Promise((resolve, reject) => {
+      request.post ({
+        url: url,
+        form: body,
+        headers: {
+          // Maximo's authentication header
+          'maxauth': encoded,
+          'x-methodoverride': 'PATCH',
+          'patchtype': 'MERGE'
+        }
+      }, function(error, response, body){
+        error = assembleError({error, response})
+        if(error) {
+          reject(error);
+          console.log(body);
+        } else {
+          // console.log(response)
           console.log("Printing response body...\n");
           console.log(JSON.stringify(body, null, 4) + "\n");
           console.log("POST succeeded.");
