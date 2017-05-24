@@ -39,7 +39,27 @@ create({
       SITEID: dataValue("form.SITEID")(state),
       LOCATION: dataValue("form.LOCATION")(state),
       ISSUEUNIT: "FOO",
-      PHYSCNT: dataValue("PHYSCNT"),
+      PHYSCNT: dataValue("PHYSCNT")(state),
+      BINNUM: dataValue("form.BINNUM")(state)
+    }
+  }
+});
+```
+
+### sample 'update75' expression
+```js
+update75({
+  endpoint: state => {
+    return "maxrest/rest/os/mxinvbal/" + dataValue("form.question1.INVBALANCESID")(state)
+  },
+  body: state => {
+    return {
+      _action: "AddChange" //this is required for the old Maximo API!
+      ITEMNUM: dataValue("form.ITEMNUM")(state),
+      ITEMSETID: dataValue("form.ITEMSETID")(state),
+      SITEID: dataValue("form.SITEID")(state),
+      LOCATION: dataValue("form.LOCATION")(state),
+      PHYSCNT: dataValue("form.PHYSCNT")(state),
       BINNUM: dataValue("form.BINNUM")(state)
     }
   }

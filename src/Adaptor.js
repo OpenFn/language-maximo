@@ -171,6 +171,16 @@ export function create(params) {
 
 }
 
+/**
+ * Make an update in Maximo 7.6 and beyond
+ * @example
+ * execute(
+ *   update(params)
+ * )(state)
+ * @constructor
+ * @param {object} params - data to make the update
+ * @returns {Operation}
+ */
 export function update(params) {
 
   return state => {
@@ -185,16 +195,14 @@ export function update(params) {
 
     const { username, password, baseUrl } = state.configuration;
 
-    var authy = username+":"+password;
-    // console.log(authy)
+    var authy = username + ":" + password;
     var bytes = utf8.encode(authy);
     var encoded = base64.encode(bytes);
-    // console.log(encoded);
 
     const url = resolveUrl(baseUrl + '/', endpoint)
 
     console.log("Performing update at URL: " + url);
-    console.log("Body:")
+    console.log("Update data:")
     console.log(JSON.stringify(body, null, 4) + "\n");
 
     return new Promise((resolve, reject) => {
@@ -213,10 +221,9 @@ export function update(params) {
           reject(error);
           console.log(body);
         } else {
-          // console.log(response)
           console.log("Printing response body...\n");
           console.log(JSON.stringify(body, null, 4) + "\n");
-          console.log("POST succeeded.");
+          console.log("Update succeeded.");
           resolve(body);
         }
       })
@@ -229,6 +236,16 @@ export function update(params) {
 
 }
 
+/**
+ * Make an upadte in Maximo 7.5
+ * @example
+ * execute(
+ *   update75(params)
+ * )(state)
+ * @constructor
+ * @param {object} params - data to make the update
+ * @returns {Operation}
+ */
 export function update75(params) {
 
   return state => {
@@ -243,16 +260,14 @@ export function update75(params) {
 
     const { username, password, baseUrl } = state.configuration;
 
-    var authy = username+":"+password;
-    // console.log(authy)
+    var authy = username + ":" + password;
     var bytes = utf8.encode(authy);
     var encoded = base64.encode(bytes);
-    // console.log(encoded);
 
     const url = resolveUrl(baseUrl + '/', endpoint)
 
     console.log("Performing update at URL: " + url);
-    console.log("Body:")
+    console.log("Update data:")
     console.log(JSON.stringify(body, null, 4) + "\n");
 
     return new Promise((resolve, reject) => {
@@ -271,10 +286,9 @@ export function update75(params) {
           reject(error);
           console.log(body);
         } else {
-          // console.log(response)
-          console.log("Printing response body...\n");
+          console.log("Printing update response body...\n");
           console.log(JSON.stringify(body, null, 4) + "\n");
-          console.log("POST succeeded.");
+          console.log("Update succeeded.");
           resolve(body);
         }
       })
