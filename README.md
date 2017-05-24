@@ -54,7 +54,7 @@ update75({
   },
   body: state => {
     return {
-      _action: "AddChange" //this is required for the old Maximo API!
+      _action: "AddChange", //this is required for the old Maximo API!
       ITEMNUM: dataValue("form.ITEMNUM")(state),
       ITEMSETID: dataValue("form.ITEMSETID")(state),
       SITEID: dataValue("form.SITEID")(state),
