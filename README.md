@@ -8,7 +8,8 @@ Documentation
 ## Fetch
 
 #### sample configuration
-```js
+
+```json
 {
   "username": "taylor",
   "password": "supersecret",
